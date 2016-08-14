@@ -94,6 +94,13 @@ class mongodb::server (
     validate_string($ssl_key, $ssl_ca)
   }
 
+  # Fix mongodb v3.2.8, recheck / remove for v3.2.9+
+  file { '/lib/systemd/system/mongod.service':                                                                                                                                                              
+    content => file('mongodb/mongodb_3.2.8_fix_no_systemd_service_file.txt'),
+    before  => Class['mongodb::server::service'],                                                                                                                                                           
+    require => Class['mongodb::server::install']
+  }                                                                                                                                                                                                         
+
   if ($ensure == 'present' or $ensure == true) {
     if $restart {
       anchor { 'mongodb::server::start': }->
